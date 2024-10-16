@@ -287,7 +287,7 @@ class KanbanController < ApplicationController
     session_hash["project_all"] = @project_all
     session_hash["version_id"] = @version_id
     session_hash["open_versions"] = @open_versions
-    session_hash["status_fields"] = @status_fields
+    session_hash["status_fields"] = @status_fields.ids
     session_hash["wip_max"] = @wip_max
     session_hash["card_size"] = @card_size
     session_hash["show_ancestors"] = @show_ancestors
@@ -364,10 +364,11 @@ class KanbanController < ApplicationController
     end
 
     # Selected statuses
-    if !session_hash.blank? && params[:status_fields].blank?
-      @status_fields = session_hash["status_fields"]
-    else
-      @status_fields = params[:status_fields]
+    @status_fields = StatusField.find_by_project_id(@project_id)
+    if params[:status_fields].present?
+      @status_fields = StatusField.new(project_id: @project_id) if @status_fields.blank?
+      @status_fields.ids = params[:status_fields]
+      @status_fields.save
     end
 
     # Max number of WIP issue
@@ -453,7 +454,7 @@ class KanbanController < ApplicationController
     # Array of status ID for display
     @status_fields_array = []
     if !@status_fields.blank? then
-      @status_fields.each {|id,chk|
+      @status_fields.ids.each {|id,chk|
         if chk == "1"
           @status_fields_array << id.to_i
         end
