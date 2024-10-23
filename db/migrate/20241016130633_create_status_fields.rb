@@ -5,6 +5,6 @@ class CreateStatusFields < ActiveRecord::Migration[6.1]
       t.integer :project_id
       t.timestamps
     end
-    add_index :status_fields, :project_id
+    add_index :status_fields, :project_id, unique: true
   end
 end
